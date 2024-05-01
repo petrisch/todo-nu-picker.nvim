@@ -1,29 +1,28 @@
-local nu_config = "C:\\Users\\patrick.joerg\\Appdata\\Roaming\\nushell\\config.nu"
-local wiki_path = "C:\\Users\\patrick.joerg\\vimwiki\\"
-
 local pickers = require "telescope.pickers"
 local finders = require "telescope.finders"
 local conf = require("telescope.config").values
-local actions = require "telescope.actions"
-local previewers = require "telescope.previewers"
-local action_state = require "telescope.actions.state"
 local utils = require "telescope.utils"
 
-opts = opts or {}
+local M = {}
+
+M.setup = function(setup_config)
+    nu_config = setup_config.nu_config or "~/.config/nushell/config.nu"
+    wiki_path = setup_config.wiki_path or "~/wiki"
+end
 
 local function get_todos(opts)
   local cmd = "--config " .. nu_config .. " -c 'td | to json'"
   opts.cmd = {"nu", cmd}
-  response =  utils.get_os_command_output(opts.cmd)
+  local response =  utils.get_os_command_output(opts.cmd)
   local res = ""
-  for i,v in ipairs(response) do 
+  for i, v in ipairs(response) do
     res = res .. v
   end
   return vim.json.decode(res)
 end
 
 -- our picker function:
-local todo_nu = function(opts)
+M.todo_nu_picker = function(opts)
   opts = opts or {}
 
   pickers.new(opts, {
@@ -34,8 +33,8 @@ local todo_nu = function(opts)
       entry_maker = function(entry) -- gets called for every entry
         return {
           value = entry,
-          display = entry["todo"] .. " " .. entry["item"], -- Text as well as the icon get displayed
-          ordinal = entry["item"], -- the values for which they get sorted
+          display = entry["todo"] .. " " .. entry["file"] .. " | " .. entry["item"], -- Text as well as the icon get displayed
+          ordinal = entry["file"], -- the values for which they get sorted
           filename = wiki_path .. entry["file"] .. '.md', -- The file to open
           lnum = tonumber(entry["line"]), -- at this line number
         }
@@ -53,3 +52,11 @@ local todo_nu = function(opts)
     -- end,
   }):find()
 end
+
+return require("telescope").register_extension {
+  setup = M.setup,
+
+  exports = {
+    todo_nu_picker = M.todo_nu_picker,
+  },
+}
