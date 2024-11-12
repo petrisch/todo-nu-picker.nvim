@@ -5,9 +5,10 @@ local utils = require("telescope.utils")
 
 local M = {}
 
-M.setup = function(setup_config)
-	Nu_config = setup_config.nu_config or "~/.config/nushell/config.nu"
-	Wiki_path = setup_config.wiki_path or "~/wiki/"
+M.setup = function(ext_config)
+	local config = ext_config
+	Nu_config = config.ext_config.nu_config or "~/.config/nushell/config.nu"
+	Wiki_path = config.ext_config.wiki_path or "~/wiki"
 end
 
 local function get_todos(opts)
@@ -15,7 +16,7 @@ local function get_todos(opts)
 	opts.cmd = { "nu", cmd }
 	local response = utils.get_os_command_output(opts.cmd)
 	local res = ""
-	for i, v in ipairs(response) do
+	for _, v in ipairs(response) do
 		res = res .. v
 	end
 	return vim.json.decode(res)
@@ -41,7 +42,8 @@ M.todo_nu_picker = function(opts)
 					}
 				end,
 			}),
-			-- previewer = previewers.get_previewer(opts),
+			-- For now the generic_sorter is enough.
+			-- Maybe this could be used if a priority or sprint colunm is added to todo-nu
 			sorter = conf.generic_sorter(opts),
 			-- attach_mappings = function(prompt_bufnr, map)
 			--   actions.select_default:replace(function()
@@ -57,6 +59,7 @@ end
 
 return require("telescope").register_extension({
 	setup = M.setup,
+	-- vim.print(M.opts),
 
 	exports = {
 		todo_nu_picker = M.todo_nu_picker,

@@ -9,17 +9,30 @@ A Telescope extension that allows to fuzzy find your todos.
 - neovim and [Telescope](https://github.com/nvim-telescope/telescope.nvim)
 - Since todo-nu depends on ripgrep and git you need those too.
 
-
 ## Installation
 
-With Lazy the installation is:
+With Lazy the installation goes like this:
 
+```lua
+  {
+    "petrisch/todo-nu-picker.nvim",
+    config = function()
+      require("telescope").setup({
+        extensions = {
+          todo_nu_picker = {
+            ext_config = {
+              nu_config = "~/.config/nushell/config.nu",
+              wiki_path = "~/wiki/",
+            },
+          },
+        },
+      })
+    end,
+  },
 ```
-{
-  "petrisch/todo-nu-picker.nvim",
-}
-```
-You have to provide the path to your nushell configuration,
+
+If the default paths are the same, the whole config function is optional.
+Otherwise you have to provide the path to your nushell configuration,
 where the `td` command is supposed to be sourced.
 Also you need the path to your wiki added, where the todos are comming from.
 
@@ -29,3 +42,5 @@ Maybe you have that folder already set up for something like [vimwiki](https://g
 
 Telescope should be picking up the plugin extension and let you run it with `:Telescope todo-nu-picker`.
 
+On Lazy distro I have set the keymap to `<leader>fd` for "find doings",
+since the "search todo" is already taken for `TODO` and `FIXME` entries.
