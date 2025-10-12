@@ -1,14 +1,14 @@
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
-local conf = require("telescope.config").values
+local telescope_config = require("telescope.config").values
 local utils = require("telescope.utils")
+local config = require("todo-nu-picker")
 
 local M = {}
 
-M.setup = function(ext_config)
-	local config = ext_config
-	Nu_config = config.ext_config.nu_config or "~/.config/nushell/config.nu"
-	Wiki_path = config.ext_config.wiki_path or "~/wiki"
+M.setup = function()
+	Nu_config = config.Nu_config or "~/.config/nushell/config.nu"
+	Wiki_path = config.Wiki_path or "~/wiki"
 end
 
 local function get_todos(opts)
@@ -44,7 +44,7 @@ M.todo_nu_picker = function(opts)
 			}),
 			-- For now the generic_sorter is enough.
 			-- Maybe this could be used if a priority or sprint colunm is added to todo-nu
-			sorter = conf.generic_sorter(opts),
+			sorter = telescope_config.generic_sorter(opts),
 			-- attach_mappings = function(prompt_bufnr, map)
 			--   actions.select_default:replace(function()
 			--     actions.close(prompt_bufnr)
