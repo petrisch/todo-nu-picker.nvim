@@ -6,9 +6,20 @@ local config = require("todo-nu-picker")
 
 local M = {}
 
+M.register = function()
+	return require("telescope").register_extension({
+		setup = M.setup,
+
+		exports = {
+			todo_nu_picker = M.todo_nu_picker,
+		},
+	})
+end
+
 M.setup = function()
 	Nu_config = config.Nu_config or "~/.config/nushell/config.nu"
 	Wiki_path = config.Wiki_path or "~/wiki"
+	M.register()
 end
 
 local function get_todos(opts)
@@ -56,12 +67,3 @@ M.todo_nu_picker = function(opts)
 		})
 		:find()
 end
-
-return require("telescope").register_extension({
-	setup = M.setup,
-	-- vim.print(M.opts),
-
-	exports = {
-		todo_nu_picker = M.todo_nu_picker,
-	},
-})

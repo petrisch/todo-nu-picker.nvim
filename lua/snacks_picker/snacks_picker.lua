@@ -1,28 +1,48 @@
+-- Snacks_config = require("Snacks.picker").Config
+
 local M = {}
 
 M.setup = function(todo_opts)
-	-- Nu_config = config.Nu_config or "~/.config/nushell/config.nu"
-	-- Wiki_path = config.Wiki_path or "~/wiki"
+	Nu_config = todo_opts.Nu_config or "~/.config/nushell/config.nu"
+	Wiki_path = todo_opts.Wiki_path or "~/wiki"
+	Snacks.notifier.notify("setup calling", "warn")
 
-	Snacks.notifier.notify("asdf blbl", "warn")
-	Snacks.picker.pick({
-		finder = function(picker, opts)
-			return function(ctx)
-				Snacks.picker.util.cmd(
-					{ "nu", "--config" .. todo_opts.nu_config .. " -c", "td | to json" },
-					function(lines)
-						local items = {}
-						local res = ""
-						for _, line in ipairs(lines) do
-							res = res .. line
-						end
-						items = vim.json.decode(res)
-						ctx.emit(items)
-						ctx.done()
-					end
-				) -- , { cwd = opts.cwd })
+	function Pick()
+		return M.picker(todo_opts)
+	end
+
+	vim.keymap.set("n", "<leader>fD", Pick, { silent = true, desc = "Show Dashboard" })
+end
+
+M.finder = function(opts)
+	Snacks.notifier.notify("registering picker", "warn")
+	return function(ctx)
+		local cmd = "nu " .. "--config " .. opts.nu_config .. " -c 'td | to json'"
+		-- local cmd = "git log"
+		Snacks.notifier.notify("command is: " .. cmd, "warn")
+
+		Snacks.picker.util.cmd(cmd, function(lines)
+			-- Snacks.notifier.notify("lines from nu: " .. lines, "warn")
+			local res = ""
+			-- local res = "{'items:'"
+			for _, line in ipairs(lines) do
+				res = res .. line
 			end
-		end,
+			-- res = res .. "}"
+			Snacks.notifier.notify("Res: " .. res, "warn")
+			local items = vim.json.decode(res)
+			Snacks.notifier.notify("Items: " .. vim.inspect(items), "warn")
+			Snacks.notifier.notify("Items: " .. vim.inspect(items.file), "warn")
+			-- So far this items is a table wit hte right thing in it, but what form do we actually need?
+			ctx.emit(items)
+			ctx.done()
+		end, { cwd = opts.wiki_path })
+	end
+end
+
+M.picker = function(opts)
+	Snacks.picker.pick({
+		finder = M.finder(opts),
 		format = "file",
 		preview = "file",
 		confirm = "jump",
