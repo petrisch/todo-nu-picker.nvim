@@ -5,13 +5,13 @@ local M = {}
 M.setup = function(todo_opts)
 	Nu_config = todo_opts.nu_config or "~/.config/nushell/config.nu"
 	Wiki_path = todo_opts.wiki_path or "~/wiki"
-	Snacks.notifier.notify("setup fzf: " .. Nu_config, "warn")
+	-- Snacks.notifier.notify("setup fzf: " .. Nu_config, "warn")
 
 	function Pick()
 		M.fzf_pick_todo(todo_opts)
 	end
 
-	vim.keymap.set("n", "<leader>fD", Pick, { silent = true, desc = "Get todos" })
+	vim.keymap.set("n", "<leader>fd", Pick, { silent = true, desc = "Get todos" })
 end
 
 M.fzf_pick_todo = function(opts)
