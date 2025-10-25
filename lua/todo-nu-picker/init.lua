@@ -11,7 +11,8 @@ M.setup = function(opts)
 		})
 	elseif opts.picker == "snacks" then
 		require("snacks_picker.snacks_picker").setup(opts)
-		-- Snacks.notifier.notify(opts.picker, "warn")
+	elseif opts.picker == "fzf-lua" then
+		require("fzf-lua.fzf-lua-picker").setup(opts)
 	end
 end
 
